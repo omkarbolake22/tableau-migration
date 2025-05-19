@@ -1,0 +1,15 @@
+{
+    "type": "single",
+    "source_env": "QA",
+    "source_path": "/Demo/DataSources/Campaign", 
+    "datasource_name": "v_demo_campaign_benchmark_datamart_tblu",
+    "dest_env": "DEV",
+    "dest_path": "/mg",
+    "schema_change": "analake_demo1_db",
+    "connection": {
+        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+        "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
+        "access_key": "ACCESS_KEY",
+        "secret_key": "SECRET_KEY"
+    }
+}
