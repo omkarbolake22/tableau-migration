@@ -1,15 +1,15 @@
 {
     "type": "single",
     "source_env": "QA",
-    "source_path": "/Demo/DataSources/Campaign", 
-    "datasource_name": "v_demo_campaign_benchmark_datamart_tblu",
-    "dest_env": "DEV",
-    "dest_path": "/mg",
-    "schema_change": "analake_demo1_db",
+    "source_path": "/Reveal/Data Sources/Course", 
+    "datasource_name": "v_page_userselection_datamart_tblu_final",
+    "dest_env": "PROD",
+    "dest_path": "/Deployment",
+    "schema_change": "analake_catalog_db",
     "connection": {
-        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
-        "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
-        "access_key": "ACCESS_KEY",
-        "secret_key": "SECRET_KEY"
+        "server": "vpce-0a12886c76bbbff60-qrxri9lf.athena.us-east-1.vpce.amazonaws.com",
+        "warehouse": "s3://aws-athena-query-results-us-ea st-1-889340682220/Reveal-TableauCloud/",
+        "access_key": "",
+        "secret_key": ""
     }
 }

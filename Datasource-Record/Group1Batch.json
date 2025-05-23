@@ -1,0 +1,18 @@
+{
+    "type": "batch",
+    "source_env": "QA",                       
+    "project_path": "/deployment", 
+    "dest_env": "QA",                       
+    "dest_path": "/Group_1",                
+    "schema_change": "analake_group1_db",       
+    "connection": {
+        "class": "athena",
+        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+        "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
+        "access_key": "ACCESS_KEY",
+        "secret_key": "SECRET_KEY",
+        "aws_region": "us-east-1"
+    }
+  }
+ 
+  
