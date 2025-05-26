@@ -2,7 +2,7 @@
     "customer_group_identifier": "pstest_customer_group_001",
     "target_schema_name": "analake_group6_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site in( 'Demo1') ",
+    "where_condition": " site in( 'demo1') ",
     "base_tables": [
       "v_aiscenario_tblu_final"
     ],
@@ -11,10 +11,10 @@
     "schema_description": "Schema for PSTest Customer Group containing filtered views.",
     "connection": {
       "class": "athena",
-      "server_endpoint_url": "https://vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+      "server_endpoint_url": "https://",
       "s3_output_location": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
-      "access_key": "ACCESS_KEY",
-      "secret_key": "SECRET_KEY",
+      "access_key": "",
+      "secret_key": "",
       "aws_region": "us-east-1",
       "workgroup": "primary"
     }

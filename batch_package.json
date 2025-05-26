@@ -7,7 +7,7 @@
     "schema_change": "analake_deployment_db",       
     "connection": {
         "class": "athena",
-        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+        "server": "",
         "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
         "access_key": "",
         "secret_key": "",
