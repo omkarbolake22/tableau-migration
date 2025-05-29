@@ -1,8 +1,8 @@
 {
-    "customer_group_identifier": "course_group_1",
-    "target_schema_name": "analake_group1_db",
+    "customer_group_identifier": "pstest_customer_group_001",
+    "target_schema_name": "analake_course_group4_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site_name in( 'lcecpartner6','qatracking06','pstest','catalyst04') ",
+    "where_condition": " 1=2 ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",
