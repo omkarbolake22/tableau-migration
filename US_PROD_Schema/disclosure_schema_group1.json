@@ -1,10 +1,12 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group3_db",
+    "target_schema_name": "analake_Disclosure_group1_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " 1=2 ",
-    "base_tables": [
-      "v_course_users_main_details_tblu"
+    "where_condition": "",
+    "base_tables": [     
+      "v_company_displayname",
+      "v_disclosures_benchmark_tblu_final",
+      "v_disclosures_tblu_final"
     ],
     "tags": {
     },

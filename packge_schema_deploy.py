@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 
 AWS_REGION = "us-east-1"
-S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/" # From your logs
+S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-889340682220-us-east-1/ProdUS.Revealv2-Deployment-Role/" # From your logs
 ATHENA_WORKGROUP = "primary"
 
 def load_config(config_path):
@@ -197,9 +197,18 @@ def main(config_file_path):
                 logging.error(f"Failed to create/replace view '{view_name_for_log}': {e}")
 
     logging.info("Athena schema and view management script completed.")
+def display_caller_identity():
+    sts_client = boto3.client('sts')
 
+    response = sts_client.get_caller_identity()
+
+    print("AWS Caller Identity:")
+    print(f"- Account ID : {response['Account']}")
+    print(f"- ARN        : {response['Arn']}")
+    print(f"- User ID    : {response['UserId']}")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Athena Schema & View Management Script (gluecreds.py)")
     parser.add_argument("config_file_path", help="Path to the JSON configuration file (e.g., schema_request.json)")
     args = parser.parse_args()
+    display_caller_identity()
     main(args.config_file_path)

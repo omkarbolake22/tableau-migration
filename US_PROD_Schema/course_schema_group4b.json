@@ -11,8 +11,8 @@
     "schema_description": "Schema for PSTest Customer Group containing filtered views.",
     "connection": {
       "class": "athena",
-      "server_endpoint_url": "https://",
-      "s3_output_location": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
+      "server_endpoint_url": "https://vpce-0a12886c76bbbff60-qrxri9lf.athena.us-east-1.vpce.amazonaws.com",
+      "s3_output_location": "s3://aws-athena-query-results-889340682220-us-east-1/ProdUS.Revealv2-Deployment-Role/",
       "access_key": "",
       "secret_key": "",
       "aws_region": "us-east-1",
