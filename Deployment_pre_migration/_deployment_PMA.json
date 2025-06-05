@@ -1,0 +1,18 @@
+{
+    "type": "batch",
+    "source_env": "QA",                       
+    "project_path": "/Reveal/Data Sources/PMA", 
+    "dest_env": "QA",                       
+    "dest_path": "/_deployment_/Campaign",                
+    "schema_change": "analake_deployment_db",       
+    "connection": {
+        "class": "athena",
+        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+        "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
+        "access_key": "",
+        "secret_key": "",
+        "aws_region": "us-east-1"
+    }
+  }
+ 
+  

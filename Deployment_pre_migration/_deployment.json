@@ -1,0 +1,21 @@
+{
+    "type": "batch",
+    "source_env": "QA",                       
+    "project_path": "/Reveal/Data Sources/Course", 
+    "dest_env": "QA",                       
+    "dest_path": "/_deployment_",                
+    "schema_change": "analake_deployment_db",       
+    "connection": {
+        "class": "athena",
+        "server": "vpce-0ab9b8d75011428bc-j9tzj0ge.athena.us-east-1.vpce.amazonaws.com",
+        "warehouse": "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/",
+        "access_key": "",
+        "secret_key": "",
+        "aws_region": "us-east-1"
+    },
+     "exclude_package":["v_course_datamart_tblu_final","v_course_datamart_country_tblu_final","v_aiscenario_tblu_final","v_completion_kpis_benchmark_tblu_final","v_completion_kpis_tblu_final","v_course_users_main_details_tblu","v_courses_custom_filters","v_page_segmentlevel_datamart_tblu_final","v_kc_userselection_datamart_page_tblu_final","v_course_benchmark_datamart_tblu_final","v_course_datamart_attempt0_tblu_final","v_kc_datamart_tblu_final","v_personalization_questions_tblu_final","v_testout_datamart_tblu_final","v_testout_userselection_datamart_tblu_final"],
+     "job": "job_20250530_163431",
+     "packages": ["v_page_userselection_datamart_tblu_final"] 
+  }
+ 
+  
