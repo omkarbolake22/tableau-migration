@@ -1,8 +1,8 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group1_db",
+    "target_schema_name": "analake_course_group3_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site_name in( 'benchmark','qaeu01','qaeu02') ",
+    "where_condition": " site_name in( 'benchmark','actylis', 'adidas', 'adidas01', 'apheon', 'apheonstaging', 'artemisfunds', 'brsbrokers', 'brsbrokersstaging', 'chainiq', 'chainiqstaging', 'clara-pensions', 'conservateur', 'conservateur01', 'degroofpetercam', 'degroofpetercamstaging', 'downing', 'dtmidstream', 'elfc', 'elfcstaging', 'fourphase', 'fourphase01', 'globalcloudxchange', 'greystar', 'jbdh', 'jbdhstaging', 'milcobel', 'milcobelstaging', 'mitsuifudosan', 'mitsuifudosanstaging', 'mmxc', 'mmxcstaging', 'mtfinance', 'mtfinance01', 'oddo', 'oddostaging', 'oneim', 'oneimstaging', 'positive-arb', 'positive-arbstaging', 'probitas1492', 'probitas1492staging', 'prym-group', 'prym-group-staging', 'smbc', 'smbcstaging', 'sphere', 'spherestaging', 'sylvania-group', 'syntagmacapital', 'syntagmastaging', 'teconnectivity', 'teconnectivitystaging', 'tpf', 'tpfepl', 'vacuumschmelze', 'vacuumschmelze01', 'westfieldinsurance', 'westfieldinsurancestaging') ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",

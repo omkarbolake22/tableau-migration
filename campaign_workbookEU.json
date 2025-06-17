@@ -1,0 +1,11 @@
+{
+    "source_env": "QA",
+    "dest_env": "EUPROD",
+    "workbook_name": "Campaign",
+    "source_project_name": "/Reveal/Workbooks/Campaign",
+    "dest_project_name": "/Migration/campaign_group_1",
+    "url_replacement": {
+        "find": "https://revealv2.catalyst.qa.lrn.com/lrn-extensions/exportPPT/index.html",
+        "replace": "https://revealv2-eu.catalyst.lrn.com/lrn-extensions/exportPPT/index.html"
+    }
+}

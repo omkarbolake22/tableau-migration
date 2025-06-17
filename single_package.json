@@ -1,14 +1,14 @@
 {
     "type": "single",
     "source_env": "QA",
-    "source_path": "/Reveal/Data Sources/Course", 
-    "datasource_name": "v_page_userselection_datamart_tblu_final",
+    "source_path": "/Reveal/Data Sources/PMA", 
+    "datasource_name": "icons_export",
     "dest_env": "PROD",
-    "dest_path": "/Deployment",
+    "dest_path": "/Reveal",
     "schema_change": "analake_catalog_db",
     "connection": {
         "server": "vpce-0a12886c76bbbff60-qrxri9lf.athena.us-east-1.vpce.amazonaws.com",
-        "warehouse": "s3://aws-athena-query-results-us-ea st-1-889340682220/Reveal-TableauCloud/",
+        "warehouse": "s3://aws-athena-query-results-us-east-1-889340682220/Reveal-TableauCloud/",
         "access_key": "",
         "secret_key": ""
     }

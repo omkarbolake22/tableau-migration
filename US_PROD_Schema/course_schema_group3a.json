@@ -2,7 +2,7 @@
     "customer_group_identifier": "pstest_customer_group_001",
     "target_schema_name": "analake_course_group3_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " 1=2 ",
+    "where_condition": " site_name in( 'benchmark','alkhabeer', 'arcadis', 'arcadisstaging', 'ascotusservices', 'blueowl', 'brex', 'brexstaging', 'centralbankbahamas01', 'centralbankbahamas', 'coca-cola', 'coeurstaging', 'corespecialty', 'corespecialtystaging', 'davis-standard01', 'davis-standard', 'dupont', 'dupontstaging01', 'dzsi', 'dzsistaging', 'gatewayprogram', 'gatewayprogram-test', 'hydroone', 'ice', 'intrepidpotash01', 'intrepidpotash', 'kindsnacks', 'kindsnacksstaging', 'lendingtree', 'lendingtreestaging', 'malibuboats', 'malibuboatsstaging', 'mattr', 'mattrstaging', 'metromont', 'metromontstaging', 'metus', 'pharmaessentia', 'pharmaessentiastaging', 'rohde-schwarz', 'rohde-schwarz-staging', 'solobrands', 'solobrandsstg01', 'trustmark') ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",
