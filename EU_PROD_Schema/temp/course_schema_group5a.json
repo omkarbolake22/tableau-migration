@@ -1,8 +1,8 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group1_db",
+    "target_schema_name": "analake_course_group5_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site_name in( 'benchmark','qaeu01','qaeu02') ",
+    "where_condition": " site_name in( 'benchmark','burckhardt', 'accelerantstaging', 'burckhardt01', 'fedexstaging', 'nortal', 'ita', 'ferrexpo', 'paydekstaging', 'archromastaging', 'bacbstaging', 'eurazeostaging', 'iocstaging', 'klepierre01', 'mbclstaging', 'nipponexpress01', 'noventiqstaging', 'vbpstaging', 'itastaging', 'cumminsinc', 'kroll', 'optiver', 'nipponexpress', 'noventiq', 'balfourbeatty', 'nium', 'bacb', 'fedex', 'archroma', 'paydek', 'mbcl', 'eurazeo', 'fenergo', 'ioc', 'accelerant', 'vbp', 'ferrexpostaging', 'zurichstaging', 'balfourbeattystaging') ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",

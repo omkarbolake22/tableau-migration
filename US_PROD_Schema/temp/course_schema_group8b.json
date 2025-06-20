@@ -1,10 +1,10 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group4_db",
+    "target_schema_name": "analake_course_group8_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " 1=2 ",
+    "where_condition": "   site in( 'benchmark','lfg','nsg','littelfuse','hoya','harman','transcanadapipelines','kellanova','campbellsoupcompany','wolfspeed','nrgenergy','panynj','avanos','stepanco','ingredion','apache','sailpoint','guardianpharmacy','lincolnelectric','ncl') ",
     "base_tables": [
-      "v_course_users_main_details_tblu"
+      "v_aiscenario_tblu_final"
     ],
     "tags": {
     },

@@ -10,10 +10,10 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-AWS_REGION = "us-east-1"
+AWS_REGION = "eu-west-1"
 # S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-us-east-1-180350466832/Reveal-TableauCloud/"
-# S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-825130385159-eu-west-1/ProdEU.Revealv2-Deployment-Role/"
-S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-889340682220-us-east-1/ProdUS.Revealv2-Deployment-Role/" # From your logs
+S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-825130385159-eu-west-1/ProdEU.Revealv2-Deployment-Role/"
+# S3_ATHENA_OUTPUT_LOCATION = "s3://aws-athena-query-results-889340682220-us-east-1/ProdUS.Revealv2-Deployment-Role/" # From your logs
 ATHENA_WORKGROUP = "primary"
 
 def load_config(config_path):

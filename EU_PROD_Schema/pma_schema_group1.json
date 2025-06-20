@@ -16,7 +16,7 @@
       "class": "athena",
       "server_endpoint_url": "https://vpce-0058a5c08ea743f2e-97m7jmul.athena.eu-west-1.vpce.amazonaws.com",
       "s3_output_location": "s3://aws-athena-query-results-825130385159-eu-west-1/ProdEU.Revealv2-Deployment-Role/",
-      "access_key": "AKIA4AHM2P4DTW4WVWXD",
+      "access_key": "",
       "secret_key": "",
       "aws_region": "eu-west-1",
       "workgroup": "primary"
