@@ -3,7 +3,7 @@ import os
 import glob
 
 # Folder path where JSON files are located
-json_folder = r"C:\Files\Git\tableau-automation-scripts\US_PROD_Schema\temp"
+json_folder = r"C:\Files\Git\tableau-automation-scripts\QA_PROD_Schema\temp"
 
 # Script to execute for each JSON file
 script_to_run = "packge_schema_deploy.py"
