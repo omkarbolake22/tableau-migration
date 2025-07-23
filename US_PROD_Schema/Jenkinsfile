@@ -18,7 +18,6 @@ pipeline {
                     export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
                     echo "Current directory: $(pwd)"
-                    cd ..
                     ls -l
                     python3 run_all_json_folder.py
                     '''
