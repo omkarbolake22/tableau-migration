@@ -3,14 +3,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
     }
-    stages {
-        stage('Install boto3') {
-            steps {
-                sh '''
-                pip3 install --user boto3
-                '''
-            }
-        }
+    
         stage('Run All JSONs with AWS Credentials') {
             steps {
                 withCredentials([
