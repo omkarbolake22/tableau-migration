@@ -2,7 +2,7 @@
     "customer_group_identifier": "pstest_customer_group_001",
     "target_schema_name": "analake_course_group20_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site_name in('123', '456') ",
+    "where_condition": " site_name in('123', '456', '789') ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",
