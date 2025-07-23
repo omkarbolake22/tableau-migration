@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    environment {
+        AWS_REGION = 'us-east-1'
+    }
+    stages {
+        stage('Install boto3') {
+            steps {
+                sh '''
+                pip3 install --user boto3
+                '''
+            }
+        }
+        stage('Run All JSONs with AWS Credentials') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    sh '''
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                    cd /Tableau-Scripts/tableau-automation-scripts
+                    python3 run_all_json_folder.py
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Finished.'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
