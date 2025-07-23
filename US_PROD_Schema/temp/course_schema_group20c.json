@@ -1,8 +1,8 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group7_db",
+    "target_schema_name": "analake_course_group20_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " company in( 'benchmark','constellation','bd','redhat','xylemtraining','ironmountain')",
+    "where_condition": " company in('123', '456') ",
     "base_tables": [
       "v_course_users_main_details_tblu"
     ],
