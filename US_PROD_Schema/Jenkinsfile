@@ -19,7 +19,7 @@ pipeline {
 
                     echo "Current directory: $(pwd)"
                     ls -l
-                    python3 run_all_json_folder.py
+                    python3 run_all_json_in_folder.py
                     '''
                 }
             }
