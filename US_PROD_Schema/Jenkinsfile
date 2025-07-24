@@ -19,7 +19,7 @@ pipeline {
 
                     echo "Current directory: $(pwd)"
                   
-                    python3 run_all_json_in_folder.py > output.log 2>&1
+                    python3 run_all_json_in_folder.py 
                     EXIT_CODE=$?
                  if [ $EXIT_CODE -ne 0 ]; then
                         echo "Python script failed with exit code $EXIT_CODE"
