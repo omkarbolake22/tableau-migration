@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    environment {
+        AWS_REGION = 'us-east-1'
+    }
+    stages {
+        stage('Run All JSONs with AWS Credentials') {
+            steps {
+                withCredentials([
+string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+string(credentialsId: 'AWS_SESSION_TOKEN', variable: 'AWS_SESSION_TOKEN')
+                ]) {
+                    sh '''
+                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                    echo "Current directory: $(pwd)"
+                  
+                    python3 run_all_json_in_folder.py 
+                    EXIT_CODE=$?
+                 if [ $EXIT_CODE -ne 0 ]; then
+                        echo "Python script failed with exit code $EXIT_CODE"
+                        echo "Last 20 lines of output:"
+                        tail -n 20 output.log
+                        exit $EXIT_CODE
+                    else
+                        echo "Python script completed successfully"
+                    fi
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
