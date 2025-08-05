@@ -12,8 +12,8 @@ string(credentialsId: 'AWS_SECRET_ACCESS_KEY_EU', variable: 'AWS_SECRET_ACCESS_K
 string(credentialsId: 'AWS_SESSION_TOKEN_EU', variable: 'AWS_SESSION_TOKEN_EU')
                 ]) {
                     sh '''
-                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                    export AWS_ACCESS_KEY_ID_EU=$AWS_ACCESS_KEY_ID_EU
+                    export AWS_SECRET_ACCESS_KEY_EU=$AWS_SECRET_ACCESS_KEY_EU
 
                     echo "Current directory: $(pwd)"
                   
