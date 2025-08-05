@@ -7,9 +7,9 @@ pipeline {
         stage('Run All JSONs with AWS Credentials') {
             steps {
                 withCredentials([
-string(credentialsId: 'AWS_ACCESS_KEY_ID_EU', variable: 'AWS_ACCESS_KEY_ID_EU'),
-string(credentialsId: 'AWS_SECRET_ACCESS_KEY_EU', variable: 'AWS_SECRET_ACCESS_KEY_EU'),
-string(credentialsId: 'AWS_SESSION_TOKEN_EU', variable: 'AWS_SESSION_TOKEN_EU')
+string(credentialsId: 'AWS_ACCESS_KEY_ID_EU', variable: 'AWS_ACCESS_KEY_ID'),
+string(credentialsId: 'AWS_SECRET_ACCESS_KEY_EU', variable: 'AWS_SECRET_ACCESS_KEY'),
+string(credentialsId: 'AWS_SESSION_TOKEN_EU', variable: 'AWS_SESSION_TOKEN')
                 ]) {
                     sh '''
                     export AWS_ACCESS_KEY_ID_EU=$AWS_ACCESS_KEY_ID_EU
