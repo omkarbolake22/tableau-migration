@@ -1,0 +1,34 @@
+{
+    "customer_group_identifier": "pstest_customer_group_001",
+    "target_schema_name": "analake_course_group20_db",
+    "source_schema_name": "analake_catalog_db",
+    "where_condition": " 1=2 ",
+    "base_tables": [     
+      "v_company_displayname",
+      "v_completion_kpis_benchmark_tblu_final",
+      "v_completion_kpis_tblu_final",
+      "v_course_benchmark_datamart_tblu_final",
+      "v_course_datamart_attempt0_tblu_final",
+      "v_course_datamart_country_tblu_final",
+      "v_course_datamart_tblu_final",
+      "v_kc_datamart_tblu_final",
+      "v_kc_userselection_datamart_page_tblu_final",
+      "v_page_segmentlevel_datamart_tblu_final",
+      "v_page_userselection_datamart_tblu_final",
+      "v_testout_datamart_tblu_final",
+      "v_personalization_questions_tblu_final",
+      "v_testout_userselection_datamart_tblu_final"
+    ],
+    "tags": {
+    },
+    "schema_description": "Schema for PSTest Customer Group containing filtered views.",
+    "connection": {
+      "class": "athena",
+      "server_endpoint_url": "https://vpce-0a12886c76bbbff60-qrxri9lf.athena.us-east-1.vpce.amazonaws.com",
+      "s3_output_location": "s3://aws-athena-query-results-889340682220-us-east-1/ProdUS.Revealv2-Deployment-Role/",
+      "access_key": "",
+      "secret_key": "",
+      "aws_region": "us-east-1",
+      "workgroup": "primary"
+    }
+  }
