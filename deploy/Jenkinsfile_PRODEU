@@ -1,0 +1,91 @@
+pipeline {
+  agent any
+  options { timestamps() }
+
+  environment {
+    AWS_DEFAULT_REGION = 'eu-west-1'
+    WORK_ROOT  = "${env.WORKSPACE}"
+    CONDA_DIR  = "${env.WORKSPACE}/miniconda"     // user-space conda
+    PATH       = "${env.CONDA_DIR}/bin:${env.PATH}"
+  }
+
+  stages {
+    stage('Checkout') { steps { checkout scm } }
+
+    stage('Setup Python (user-space)') {
+      steps {
+        sh '''
+          set -eu
+          if [ ! -x "${CONDA_DIR}/bin/python" ]; then
+            mkdir -p "${WORK_ROOT}/_tmp"
+            cd "${WORK_ROOT}/_tmp"
+            curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh
+            sh miniconda.sh -b -p "${CONDA_DIR}"
+            rm -f miniconda.sh
+          fi
+          "${CONDA_DIR}/bin/python" --version
+        '''
+      }
+    }
+
+    stage('Run All JSONs with AWS Credentials (EU)') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID_EU',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY_EU', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_SESSION_TOKEN_EU',     variable: 'AWS_SESSION_TOKEN')
+        ]) {
+          sh '''
+            set -eu
+
+            # Create a lean py311 env and put it first on PATH
+            CONDA_ENV="${WORK_ROOT}/py311"
+            if [ ! -x "${CONDA_ENV}/bin/python" ]; then
+              "${CONDA_DIR}/bin/conda" create -y -p "${CONDA_ENV}" python=3.11
+            fi
+            export PATH="${CONDA_ENV}/bin:${PATH}"
+            hash -r
+            python --version
+            pip --version
+
+            # IMPORTANT: use the STANDARD AWS variable names (no _EU suffix)
+            export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
+            export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+            export AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}"
+            export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+
+            # Minimal deps for deploy (binary wheels only)
+            pip install --no-cache-dir --only-binary=:all: boto3 pyyaml
+
+            # Optional: verify creds via STS (boto3, not aws cli)
+            python - <<'PY'
+import os, boto3
+sts = boto3.client('sts', region_name=os.getenv('AWS_DEFAULT_REGION','eu-west-1'))
+print('STS caller:', sts.get_caller_identity()['Arn'])
+PY
+
+            echo "Running EU deploy script with $(python --version) at $(command -v python)"
+            # Run and capture logs
+            python run_all_json_in_folders_EU.py > output.log 2>&1 || true
+
+            # Show tail for quick diagnostics
+            tail -n 100 output.log || true
+
+            # Treat known failure markers as build failure
+            if grep -q "ModuleNotFoundError" output.log || grep -q "Failed on:" output.log; then
+              echo "Detected failures in output.log"
+              exit 1
+            fi
+
+            echo "Python script completed successfully"
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always  { echo 'Pipeline finished.' }
+    failure { echo 'Deployment failed!' }
+  }
+}
