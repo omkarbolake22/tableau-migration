@@ -4,21 +4,55 @@ pipeline {
 
   environment {
     AWS_REGION = 'us-east-1'
-    LOCAL_BIN  = "${env.HOME}/.local/bin"
-    PATH       = "${env.LOCAL_BIN}:${env.PATH}"
+    WORK_ROOT  = "${env.WORKSPACE}"            // base dir we can write to
+    CONDA_DIR  = "${env.WORKSPACE}/miniconda"  // user-space Python
+    LOCAL_BIN  = "${env.WORKSPACE}/.local/bin" // user-space bin for aws
+    PATH       = "${env.LOCAL_BIN}:${env.CONDA_DIR}/bin:${env.PATH}"
   }
 
   stages {
     stage('Checkout') { steps { checkout scm } }
 
-    stage('Setup awscli (user-space)') {
+    stage('Setup Python (user-space Miniconda)') {
       steps {
         sh '''
           set -eu
-          # Install/upgrade pip and awscli under ~/.local
-          python3 -m ensurepip --upgrade || true
-          python3 -m pip install --user --upgrade pip
-          python3 -m pip install --user --upgrade awscli
+
+          # Install Miniconda silently into ${CONDA_DIR} if not present
+          if [ ! -x "${CONDA_DIR}/bin/python" ]; then
+            mkdir -p "${WORK_ROOT}/_tmp"
+            cd "${WORK_ROOT}/_tmp"
+            curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh
+            sh miniconda.sh -b -p "${CONDA_DIR}"
+            rm -f miniconda.sh
+          fi
+
+          # Verify python is available
+          "${CONDA_DIR}/bin/python" --version
+          "${CONDA_DIR}/bin/pip" --version
+
+          # Optional: ensure pip is up to date
+          "${CONDA_DIR}/bin/python" -m pip install --upgrade pip
+        '''
+      }
+    }
+
+    stage('Setup AWS CLI v2 (user-space)') {
+      steps {
+        sh '''
+          set -eu
+          mkdir -p "${LOCAL_BIN}"
+
+          if ! command -v aws >/dev/null 2>&1; then
+            echo "Installing AWS CLI v2 into workspace..."
+            mkdir -p "${WORK_ROOT}/_tmp"
+            cd "${WORK_ROOT}/_tmp"
+            curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+            unzip -q -o awscliv2.zip
+            ./aws/install -i "${WORK_ROOT}/.aws-cli" -b "${LOCAL_BIN}"
+            rm -rf aws awscliv2.zip
+          fi
+
           aws --version
         '''
       }
@@ -29,22 +63,25 @@ pipeline {
         sh(label: 'Revealv2 USPROD - Deployment', script: '''
           set -eu
 
-          # sanity checks
+          # Sanity checks
           command -v aws >/dev/null
-          python3 --version
+          command -v python >/dev/null || true
+          "${CONDA_DIR}/bin/python" --version
 
+          # POSIX-safe assume_role
           assume_role() {
             ROLE_ARN="$1"
             SESSION_NAME="$2"
-            # Assume role and export temp creds (POSIX-safe)
+
             creds=$(aws sts assume-role \
               --role-arn "$ROLE_ARN" \
               --role-session-name "$SESSION_NAME" \
               --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
               --output text)
-            AWS_ACCESS_KEY_ID=$(echo "$creds" | awk "{print \\$1}")
-            AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk "{print \\$2}")
-            AWS_SESSION_TOKEN=$(echo "$creds" | awk "{print \\$3}")
+
+            AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
+            AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
+            AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
             export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
           }
 
@@ -52,17 +89,15 @@ pipeline {
 
           echo "Current directory: $(pwd)"
 
-          # If you have Python deps:
-          # [ -f requirements.txt ] && python3 -m pip install --user --no-cache-dir -r requirements.txt
+          # If you have Python deps for your script, uncomment:
+          # "${CONDA_DIR}/bin/pip" install -r requirements.txt
 
-          # Run script, capture output to file, preserve exit code (no bashisms)
-          python3 run_all_json_in_folder.py > output.log 2>&1
+          # Run script using the Miniconda python, capture logs, keep POSIX compatibility
+          "${CONDA_DIR}/bin/python" run_all_json_in_folder.py > output.log 2>&1
           EXIT_CODE=$?
 
-          # Show last lines for quick debugging
           tail -n 50 output.log || true
 
-          # Fail the step if python failed
           if [ "$EXIT_CODE" -ne 0 ]; then
             echo "Python script failed with exit code $EXIT_CODE"
             exit "$EXIT_CODE"
