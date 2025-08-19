@@ -5,6 +5,11 @@ pipeline {
     }
     stages {
         stage('Run All JSONs with AWS Credentials') {
+
+    agent {
+        docker { image 'amazon/aws-cli:2' }   // <-- AWS CLI ready
+          }
+
             steps {
 
                 sh (label:"Revealv2 USPROD - Deployment", script:'''
