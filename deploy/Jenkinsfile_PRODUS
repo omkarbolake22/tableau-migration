@@ -63,12 +63,18 @@ pipeline {
     sh(label: 'Revealv2 USPROD - Deployment', script: '''
       set -eu
 
-      # Sanity checks
-      command -v aws >/dev/null
-      "${CONDA_DIR}/bin/python" --version
-      "${CONDA_DIR}/bin/pip" --version
+      # --- Create a lean Python 3.11 env (avoids numpy build issues) ---
+      CONDA_ENV="${WORK_ROOT}/py311"
+      if [ ! -x "${CONDA_ENV}/bin/python" ]; then
+        "${CONDA_DIR}/bin/conda" create -y -p "${CONDA_ENV}" python=3.11
+      fi
+      PY="${CONDA_ENV}/bin/python"
+      PIP="${CONDA_ENV}/bin/pip"
 
-      # Assume role
+      "$PY" --version
+      "$PIP" --version
+
+      # --- Assume role using AWS CLI v2 ---
       assume_role() {
         ROLE_ARN="$1"
         SESSION_NAME="$2"
@@ -84,23 +90,21 @@ pipeline {
       }
       assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
 
-      echo "Installing Python deps..."
-      if [ -f requirements.txt ]; then
-        "${CONDA_DIR}/bin/pip" install --no-cache-dir -r requirements.txt
+      # --- Install only the minimal deps needed for the deploy ---
+      # Prefer a small deploy file if you add one later; else install minimal set.
+      if [ -f requirements-deploy.txt ]; then
+        "$PIP" install --no-cache-dir --only-binary=:all: -r requirements-deploy.txt
       else
-        # minimal deps for your script
-        "${CONDA_DIR}/bin/pip" install --no-cache-dir boto3
+        "$PIP" install --no-cache-dir --only-binary=:all: boto3 pyyaml
       fi
 
+      # --- Run your script with the py311 interpreter ---
       echo "Running deploy script..."
-      # Run and capture logs
-      "${CONDA_DIR}/bin/python" run_all_json_in_folder.py > output.log 2>&1 || true
+      "$PY" run_all_json_in_folder.py > output.log 2>&1 || true
 
-      # Show last lines for visibility
-      tail -n 80 output.log || true
+      tail -n 100 output.log || true
 
-      # Fail if python exit was non-zero OR log indicates failure
-      # (adjust this grep to match your script's failure string)
+      # Treat script-reported failures as build failures
       if grep -q "ModuleNotFoundError" output.log || grep -q "Failed on:" output.log; then
         echo "Detected failures in output.log"
         exit 1
