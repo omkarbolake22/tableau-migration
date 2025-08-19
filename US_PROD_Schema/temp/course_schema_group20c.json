@@ -2,7 +2,7 @@
     "customer_group_identifier": "pstest_customer_group_001",
     "target_schema_name": "analake_course_group20_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " 1=2 ",
+    "where_condition": "  site in( '123','xyz') ",
     "base_tables": [
       "v_course_users_main_details_tblu"
     ],
