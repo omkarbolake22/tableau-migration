@@ -9,15 +9,13 @@ pipeline {
   }
 
   stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
+    stage('Checkout') { steps { checkout scm } }
 
     stage('Setup awscli (user-space)') {
       steps {
         sh '''
-          set -euxo pipefail
-          # make sure pip exists, then install awscli for the current user
+          set -eu
+          # Install/upgrade pip and awscli under ~/.local
           python3 -m ensurepip --upgrade || true
           python3 -m pip install --user --upgrade pip
           python3 -m pip install --user --upgrade awscli
@@ -28,41 +26,46 @@ pipeline {
 
     stage('Run All JSONs with AWS Credentials') {
       steps {
-        sh(label: "Revealv2 USPROD - Deployment", script: '''
-          set -euxo pipefail
+        sh(label: 'Revealv2 USPROD - Deployment', script: '''
+          set -eu
 
           # sanity checks
-          which aws
+          command -v aws >/dev/null
           python3 --version
 
           assume_role() {
-            local ROLE_ARN="$1"; local SESSION_NAME="$2"
-            local creds
+            ROLE_ARN="$1"
+            SESSION_NAME="$2"
+            # Assume role and export temp creds (POSIX-safe)
             creds=$(aws sts assume-role \
               --role-arn "$ROLE_ARN" \
               --role-session-name "$SESSION_NAME" \
               --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
               --output text)
-
-            export AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
-            export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
-            export AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
+            AWS_ACCESS_KEY_ID=$(echo "$creds" | awk "{print \\$1}")
+            AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk "{print \\$2}")
+            AWS_SESSION_TOKEN=$(echo "$creds" | awk "{print \\$3}")
+            export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
           }
 
           assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
 
           echo "Current directory: $(pwd)"
 
-          # run and capture output
-          set +e
-          python3 run_all_json_in_folder.py | tee output.log
-          EXIT_CODE=${PIPESTATUS[0]}
-          set -e
+          # If you have Python deps:
+          # [ -f requirements.txt ] && python3 -m pip install --user --no-cache-dir -r requirements.txt
 
-          if [ $EXIT_CODE -ne 0 ]; then
+          # Run script, capture output to file, preserve exit code (no bashisms)
+          python3 run_all_json_in_folder.py > output.log 2>&1
+          EXIT_CODE=$?
+
+          # Show last lines for quick debugging
+          tail -n 50 output.log || true
+
+          # Fail the step if python failed
+          if [ "$EXIT_CODE" -ne 0 ]; then
             echo "Python script failed with exit code $EXIT_CODE"
-            tail -n 20 output.log || true
-            exit $EXIT_CODE
+            exit "$EXIT_CODE"
           else
             echo "Python script completed successfully"
           fi
