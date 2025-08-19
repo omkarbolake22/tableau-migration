@@ -63,7 +63,7 @@ pipeline {
     sh(label: 'Revealv2 USPROD - Deployment', script: '''
       set -eu
 
-      # --- Create a lean Python 3.11 env (avoids numpy build issues) ---
+      # --- Create a lean Python 3.11 env ---
       CONDA_ENV="${WORK_ROOT}/py311"
       if [ ! -x "${CONDA_ENV}/bin/python" ]; then
         "${CONDA_DIR}/bin/conda" create -y -p "${CONDA_ENV}" python=3.11
@@ -71,13 +71,18 @@ pipeline {
       PY="${CONDA_ENV}/bin/python"
       PIP="${CONDA_ENV}/bin/pip"
 
+      # >>> Make sure all child processes see THIS interpreter first <<<
+      export PATH="${CONDA_ENV}/bin:${PATH}"
+      hash -r
+
       "$PY" --version
       "$PIP" --version
+      command -v python
+      command -v python3
 
-      # --- Assume role using AWS CLI v2 ---
+      # --- Assume role ---
       assume_role() {
-        ROLE_ARN="$1"
-        SESSION_NAME="$2"
+        ROLE_ARN="$1"; SESSION_NAME="$2"
         creds=$(aws sts assume-role \
           --role-arn "$ROLE_ARN" \
           --role-session-name "$SESSION_NAME" \
@@ -90,17 +95,16 @@ pipeline {
       }
       assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
 
-      # --- Install only the minimal deps needed for the deploy ---
-      # Prefer a small deploy file if you add one later; else install minimal set.
+      # --- Minimal deps for deploy (binary wheels only) ---
       if [ -f requirements-deploy.txt ]; then
         "$PIP" install --no-cache-dir --only-binary=:all: -r requirements-deploy.txt
       else
         "$PIP" install --no-cache-dir --only-binary=:all: boto3 pyyaml
       fi
 
-      # --- Run your script with the py311 interpreter ---
-      echo "Running deploy script..."
-      "$PY" run_all_json_in_folder.py > output.log 2>&1 || true
+      echo "Running deploy script with $(python --version) at $(command -v python)"
+      # Run and capture logs
+      python run_all_json_in_folder.py > output.log 2>&1 || true
 
       tail -n 100 output.log || true
 
