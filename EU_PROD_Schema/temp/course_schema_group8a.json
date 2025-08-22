@@ -1,8 +1,8 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group21_db",
+    "target_schema_name": "analake_course_group8_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " site_name in ( 'benchmark','leica-camera01','woodsbagotstaging','stonex','ain','brightspeed','woodsbagot','megabank-tw','bsigroup','furukawa','htsc','sqm','solventumtraining','ain-01','leica-camera','appliedsystems','semperit') ",
+    "where_condition": " site_name in ( 'sato-global','burando','kempower','hlib' ) ",
     "base_tables": [     
       "v_company_displayname",
       "v_completion_kpis_benchmark_tblu_final",
