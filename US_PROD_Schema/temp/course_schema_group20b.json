@@ -1,8 +1,8 @@
 {
     "customer_group_identifier": "pstest_customer_group_001",
-    "target_schema_name": "analake_course_group18_db",
+    "target_schema_name": "analake_course_group20_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": "  site in( 'ews','excelerateenergy','ferrovial','plano','starrcompanies','teneo') ",
+    "where_condition": "  site in( 'testing','ews','excelerateenergy','ferrovial','plano','starrcompanies','teneo') ",
     "base_tables": [
       "v_aiscenario_tblu_final"
     ],
