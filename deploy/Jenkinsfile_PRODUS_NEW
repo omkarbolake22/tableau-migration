@@ -41,40 +41,7 @@ pipeline {
       echo "Current directory: $(pwd)"
       python3 run_all_json_in_folder.py
     '''
-  }
-}
-Option B — Python base image + install AWS CLI (v1 via pip)
-If you’re fine with AWS CLI v1 (works for sts assume-role), use a Python image and install awscli:
-
-groovy
-Copy code
-stage('Run All JSONs with AWS Credentials') {
-  agent {
-    docker {
-      image 'python:3.11-slim'
-      args  '-u 0:0'
-    }
-  }
-  steps {
-    echo 'Revealv2 USPROD - Deployment'
-    sh '''
-      set -euo pipefail
-      pip install --no-cache-dir awscli
-
-      assume_role() {
-        local ROLE_ARN="$1"; local SESSION_NAME="$2"
-        creds=$(aws sts assume-role --role-arn "$ROLE_ARN" --role-session-name "$SESSION_NAME" \
-                 --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
-        export AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
-        export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
-        export AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
-      }
-
-      assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" \
-                  "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
-
-      python3 run_all_json_in_folder.py
-            exit_code=$?
+exit_code=$?
 
             if [ $exit_code -ne 0 ]; then
               echo "Python script failed with exit code $exit_code"
