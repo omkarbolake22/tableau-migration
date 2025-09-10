@@ -1,8 +1,12 @@
 pipeline {
-    agent any
-    environment {
-        AWS_REGION = 'eu-east-1'
-    }
+    
+agent {
+  docker {
+    image 'python:3.11-slim'
+    args '-u 0:0'
+  }
+}
+
     stages {
         stage('Run All JSONs with AWS Credentials') {
             steps {
