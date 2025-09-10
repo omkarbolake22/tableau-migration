@@ -7,53 +7,73 @@ pipeline {
 
   stages {
     stage('Run All JSONs with AWS Credentials') {
-      agent {
-        docker { image 'amazon/aws-cli:2' } // AWS CLI v2
+  agent {
+    docker {
+      image 'amazon/aws-cli:latest'   // <-- valid tag
+      args  '-u 0:0'                  // run as root so we can install pkgs
+    }
+  }
+  steps {
+    echo 'Revealv2 USPROD - Deployment'
+    sh '''
+      set -euo pipefail
+
+      # Install Python (container may be AL2/apk/apt based depending on tag)
+      if ! command -v python3 >/dev/null 2>&1; then
+        if command -v yum >/dev/null 2>&1; then yum -y install python3
+        elif command -v apk >/dev/null 2>&1; then apk add --no-cache python3 py3-pip
+        elif command -v apt-get >/dev/null 2>&1; then apt-get update && apt-get install -y python3 python3-pip
+        fi
+      fi
+
+      assume_role() {
+        local ROLE_ARN="$1"; local SESSION_NAME="$2"
+        creds=$(aws sts assume-role --role-arn "$ROLE_ARN" --role-session-name "$SESSION_NAME" \
+                 --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+        export AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
+        export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
+        export AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
       }
-      steps {
-        echo 'Revealv2 USPROD - Deployment'
 
-        // If you use Jenkins AWS credentials, wrap the shell with withCredentials.
-        // Replace 'aws-base' with your Jenkins credentialsId that has base keys able to assume the role.
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-base']]) {
-          sh '''
-            set -euo pipefail
+      assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" \
+                  "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
 
-            # Ensure Python exists in the aws-cli container (covers common bases)
-            if command -v python3 >/dev/null 2>&1; then
-              :
-            elif command -v yum >/dev/null 2>&1; then
-              yum -y install python3
-            elif command -v apk >/dev/null 2>&1; then
-              apk add --no-cache python3 py3-pip
-            elif command -v apt-get >/dev/null 2>&1; then
-              apt-get update && apt-get install -y python3 python3-pip
-            fi
+      echo "Current directory: $(pwd)"
+      python3 run_all_json_in_folder.py
+    '''
+  }
+}
+Option B — Python base image + install AWS CLI (v1 via pip)
+If you’re fine with AWS CLI v1 (works for sts assume-role), use a Python image and install awscli:
 
-            assume_role() {
-              local ROLE_ARN="$1"
-              local SESSION_NAME="$2"
+groovy
+Copy code
+stage('Run All JSONs with AWS Credentials') {
+  agent {
+    docker {
+      image 'python:3.11-slim'
+      args  '-u 0:0'
+    }
+  }
+  steps {
+    echo 'Revealv2 USPROD - Deployment'
+    sh '''
+      set -euo pipefail
+      pip install --no-cache-dir awscli
 
-              # Use the base creds from withCredentials to call STS
-              creds=$(aws sts assume-role \
-                --role-arn "$ROLE_ARN" \
-                --role-session-name "$SESSION_NAME" \
-                --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
-                --output text)
+      assume_role() {
+        local ROLE_ARN="$1"; local SESSION_NAME="$2"
+        creds=$(aws sts assume-role --role-arn "$ROLE_ARN" --role-session-name "$SESSION_NAME" \
+                 --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" --output text)
+        export AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
+        export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
+        export AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
+      }
 
-              export AWS_ACCESS_KEY_ID=$(echo "$creds" | awk '{print $1}')
-              export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | awk '{print $2}')
-              export AWS_SESSION_TOKEN=$(echo "$creds" | awk '{print $3}')
-            }
+      assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" \
+                  "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
 
-            assume_role "arn:aws:iam::889340682220:role/revealv2-tableau-usprod-deployment-role" "USPROD-Revealv2-Tableau-Jenkins-DeployRole"
-
-            echo "Current directory: $(pwd)"
-
-            # If your script needs deps, uncomment:
-            # [ -f requirements.txt ] && pip3 install -r requirements.txt
-
-            python3 run_all_json_in_folder.py
+      python3 run_all_json_in_folder.py
             exit_code=$?
 
             if [ $exit_code -ne 0 ]; then
