@@ -1,47 +1,59 @@
 pipeline {
-    
-agent {
-  docker {
-    image 'python:3.11-slim'
-    args '-u 0:0'
+  agent {
+    docker {
+      image 'python:3.11-slim'
+      args '-u 0:0'
+    }
   }
-}
 
-    stages {
-        stage('Run All JSONs with AWS Credentials') {
-            steps {
-                withCredentials([
-string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
-string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
-string(credentialsId: 'AWS_SESSION_TOKEN', variable: 'AWS_SESSION_TOKEN')
-                ]) {
-                    sh '''
-                    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-                    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+  stages {
+    stage('Run All JSONs with AWS Credentials') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_SESSION_TOKEN', variable: 'AWS_SESSION_TOKEN')
+        ]) {
+          sh '''
+            set -euo pipefail
+            # Export AWS credentials
+            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
-                    echo "Current directory: $(pwd)"
-                  
-                    python3 run_all_json_in_folders.py 
-                    EXIT_CODE=$?
-                 if [ $EXIT_CODE -ne 0 ]; then
-                        echo "Python script failed with exit code $EXIT_CODE"
-                        echo "Last 20 lines of output:"
-                        tail -n 20 output.log
-                        exit $EXIT_CODE
-                    else
-                        echo "Python script completed successfully"
-                    fi
-                    '''
-                }
-            }
+            echo "Current directory: $(pwd)"
+
+            # Install AWS CLI
+            pip install --no-cache-dir awscli
+
+            # Run Python script
+            python3 run_all_json_in_folders.py
+            EXIT_CODE=$?
+
+            if [ $EXIT_CODE -ne 0 ]; then
+              echo "Python script failed with exit code $EXIT_CODE"
+              if [ -f output.log ]; then
+                echo "Last 20 lines of output:"
+                tail -n 20 output.log || true
+              else
+                echo "output.log not found."
+              fi
+              exit $EXIT_CODE
+            else
+              echo "Python script completed successfully"
+            fi
+          '''
         }
+      }
     }
-    post {
-        always {
-            echo 'Pipeline finished.'
-        }
-        failure {
-            echo 'Deployment failed!'
-        }
+  }
+
+  post {
+    always {
+      echo 'Pipeline finished.'
     }
+    failure {
+      echo 'Deployment failed!'
+    }
+  }
 }
