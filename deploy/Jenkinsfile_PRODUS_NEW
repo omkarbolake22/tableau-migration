@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-     image 'amazon/aws-cli:2.0.30'
+     image 'python:3.11'
      args '-u 0:0'
     }
   }
