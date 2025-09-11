@@ -1,6 +1,10 @@
 pipeline {
   agent {
-    label 'Tableau-Schema-Migration-Node'
+    docker {
+      image 'python:3.11' // or a custom image with AWS CLI pre-installed
+      label 'Tableau-Schema-Migration-Node'
+      args '-u 0:0'
+    }
   }
 
   stages {
@@ -20,6 +24,7 @@ pipeline {
 
             echo "Current directory: $(pwd)"
 
+            pip install --no-cache-dir awscli
             python3 run_all_json_in_folders.py
             EXIT_CODE=$?
 
