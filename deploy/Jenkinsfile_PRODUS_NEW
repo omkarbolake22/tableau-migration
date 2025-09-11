@@ -1,9 +1,6 @@
 pipeline {
   agent {
-    docker {
-     image 'python:3.11'
-     args '-u 0:0'
-    }
+    label 'Tableau-Schema-Migration-Node'
   }
 
   stages {
@@ -16,17 +13,13 @@ pipeline {
         ]) {
           sh '''
             set -euo pipefail
-            # Export AWS credentials
+
             export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
             export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
             echo "Current directory: $(pwd)"
 
-            # Install AWS CLI
-            pip install --no-cache-dir awscli
-
-            # Run Python script
             python3 run_all_json_in_folders.py
             EXIT_CODE=$?
 
