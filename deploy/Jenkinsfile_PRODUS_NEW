@@ -28,39 +28,40 @@ pipeline {
     }
 
     stage('Run inside ECR image') {
-      steps {
-        script {
-          docker.image(env.ECR_IMAGE).inside('-u 0:0') {
-            withCredentials([
-              string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
-              string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
-              string(credentialsId: 'AWS_SESSION_TOKEN',     variable: 'AWS_SESSION_TOKEN')
-            ]) {
-              sh '''
-                set -euo pipefail
+  steps {
+    script {
+      docker.image(env.ECR_IMAGE).inside('-u 0:0') {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_SESSION_TOKEN',     variable: 'AWS_SESSION_TOKEN')
+        ]) {
+          sh '''
+            set -euo pipefail
 
-                # Make creds available in the container
-                export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
-                export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
-                export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
-                export AWS_DEFAULT_REGION="$AWS_REGION"
+            export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+            export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+            export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
+            export AWS_DEFAULT_REGION="$AWS_REGION"
 
-                echo "Workspace in container: $(pwd)"
-                ls -la
+            echo "Workspace in container: $(pwd)"
+            ls -la
+            echo "Listing deploy/:"
+            ls -la deploy
 
-                # If your ECR image doesn't have awscli and you need it, install via pip:
-                # pip install --no-cache-dir awscli
+            # ensure AWS CLI is available (only needed if not baked into the image)
+            command -v aws >/dev/null 2>&1 || pip install --no-cache-dir awscli
 
-                # Run your workload
-                python3 run_all_json_in_folders.py
-
-                echo "Python script completed successfully"
-              '''
-            }
-          }
+            # run the script from its directory so relative paths work
+            cd deploy
+            echo "Running: python3 run_all_json_in_folders.py"
+            python3 run_all_json_in_folders.py
+          '''
         }
       }
     }
+  }
+}
   }
 
   post {
