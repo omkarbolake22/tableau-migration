@@ -57,7 +57,7 @@ pipeline {
             command -v aws >/dev/null 2>&1 || pip install --no-cache-dir awscli
 
             echo "Running: python3 run_all_json_in_folders.py"
-            python3 run_all_json_in_folders.py
+            python3 run_all_json_in_folder.py
             echo "Python script completed successfully"
           '''
         }
