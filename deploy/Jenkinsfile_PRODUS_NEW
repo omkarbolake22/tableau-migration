@@ -46,16 +46,19 @@ pipeline {
 
             echo "Workspace in container: $(pwd)"
             ls -la
-            echo "Listing deploy/:"
-            ls -la deploy
 
-            # ensure AWS CLI is available (only needed if not baked into the image)
+            # sanity check: script must be at repo root
+            test -f run_all_json_in_folders.py || { 
+              echo "ERROR: run_all_json_in_folders.py not found at repo root."; 
+              exit 1; 
+            }
+
+            # install awscli if your image doesn't have it
             command -v aws >/dev/null 2>&1 || pip install --no-cache-dir awscli
 
-            # run the script from its directory so relative paths work
-            cd deploy
             echo "Running: python3 run_all_json_in_folders.py"
             python3 run_all_json_in_folders.py
+            echo "Python script completed successfully"
           '''
         }
       }
