@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'tableau-schema-migration-node' }
+  agent { label 'Tableau-Schema-Migration-Node' }
 
   environment {
     AWS_REGION = 'us-east-1'
