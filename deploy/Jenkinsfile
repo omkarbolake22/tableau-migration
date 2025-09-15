@@ -3,21 +3,26 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        ECR_REPO = '180350466832.dkr.ecr.us-east-1.amazonaws.com/tableau-schema-migration'
-        IMAGE_NAME = 'tableau-schema-migration'
+        ACCOUNT_ID = '180350466832'
+        REPO_NAME  = 'tableau-schema-migration'
+        REGISTRY   = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        ECR_REPO   = "${REGISTRY}/${REPO_NAME}"
     }
 
     stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME} -f deploy/Dockerfile ."
-                sh "docker tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest"
+                sh "docker build -t ${ECR_REPO}:latest ."
             }
         }
 
         stage('Login to AWS ECR') {
             steps {
-                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}"
+                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}"
             }
         }
 
