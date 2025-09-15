@@ -16,7 +16,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${ECR_REPO}:latest ."
+               
+                sh 'docker build -t ${ECR_REPO}:latest -f deploy/Dockerfile .'
             }
         }
 
