@@ -1,46 +1,63 @@
 pipeline {
-  agent {
-    docker {
-      image 'python:3.11' // or a custom image with AWS CLI pre-installed
-      label 'Tableau-Schema-Migration-Node'
-      args '-u 0:0'
-    }
+  agent { label 'tableau-schema-migration-node' }
+
+  environment {
+    AWS_REGION = 'us-east-1'
+    ACCOUNT_ID = '180350466832'
+    REPO_NAME  = 'tableau-schema-migration'
+    REGISTRY   = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    ECR_IMAGE  = "${REGISTRY}/${REPO_NAME}:latest"   // or use a commit tag you pushed
   }
 
+  options { timestamps() }
+
   stages {
-    stage('Run All JSONs with AWS Credentials') {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Login to ECR & Pull Image') {
       steps {
-        withCredentials([
-          string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'AWS_SESSION_TOKEN', variable: 'AWS_SESSION_TOKEN')
-        ]) {
-          sh '''
-            set -euo pipefail
+        sh '''
+          set -e
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin "$REGISTRY"
+          docker pull "$ECR_IMAGE"
+        '''
+      }
+    }
 
-            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+    stage('Run inside ECR image') {
+      steps {
+        script {
+          docker.image(env.ECR_IMAGE).inside('-u 0:0') {
+            withCredentials([
+              string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+              string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+              string(credentialsId: 'AWS_SESSION_TOKEN',     variable: 'AWS_SESSION_TOKEN')
+            ]) {
+              sh '''
+                set -euo pipefail
 
-            echo "Current directory: $(pwd)"
+                # Make creds available in the container
+                export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+                export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+                export AWS_SESSION_TOKEN="$AWS_SESSION_TOKEN"
+                export AWS_DEFAULT_REGION="$AWS_REGION"
 
-            pip install --no-cache-dir awscli
-            python3 run_all_json_in_folders.py
-            EXIT_CODE=$?
+                echo "Workspace in container: $(pwd)"
+                ls -la
 
-            if [ $EXIT_CODE -ne 0 ]; then
-              echo "Python script failed with exit code $EXIT_CODE"
-              if [ -f output.log ]; then
-                echo "Last 20 lines of output:"
-                tail -n 20 output.log || true
-              else
-                echo "output.log not found."
-              fi
-              exit $EXIT_CODE
-            else
-              echo "Python script completed successfully"
-            fi
-          '''
+                # If your ECR image doesn't have awscli and you need it, install via pip:
+                # pip install --no-cache-dir awscli
+
+                # Run your workload
+                python3 run_all_json_in_folders.py
+
+                echo "Python script completed successfully"
+              '''
+            }
+          }
         }
       }
     }
