@@ -13,9 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make port 80 available to the world outside this container (optional)
 EXPOSE 80
 
-# Define environment variable (optional)
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
 
 # Run the application
 CMD ["python", "main.py"]
