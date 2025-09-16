@@ -48,7 +48,7 @@ pipeline {
             ls -la
 
             # sanity check: script must be at repo root
-            test -f run_all_json_in_folders.py || { 
+            test -f run_all_json_in_folder.py || { 
               echo "ERROR: run_all_json_in_folders.py not found at repo root."; 
               exit 1; 
             }
