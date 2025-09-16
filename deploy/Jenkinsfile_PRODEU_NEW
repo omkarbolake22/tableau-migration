@@ -56,7 +56,7 @@ pipeline {
 
             # Run the script at repo root (singular 'folder')
             echo "Running: python3 -u run_all_json_in_folders_EU.py"
-            python3 -u run_all_json_in_folder.py
+            python3 -u run_all_json_in_folders_EU.py
           '''
         }
       }
