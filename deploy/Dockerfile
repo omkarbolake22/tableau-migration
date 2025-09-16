@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . /app
 
 # Install Python deps first (better layer caching)
-COPY requirements.txt /tmp/requirements.txt
+COPY deploy/requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip \
  && python -m pip install -r /tmp/requirements.txt
 
