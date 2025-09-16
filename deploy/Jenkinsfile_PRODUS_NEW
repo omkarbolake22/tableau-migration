@@ -47,18 +47,15 @@ pipeline {
             echo "Workspace in container: $(pwd)"
             ls -la
 
-            # sanity check: script must be at repo root
-            test -f run_all_json_in_folder.py || { 
-              echo "ERROR: run_all_json_in_folders.py not found at repo root."; 
-              exit 1; 
-            }
+            # Disable pip progress UI to avoid thread spawn issues
+            export PIP_PROGRESS_BAR=off
 
-            # install awscli if your image doesn't have it
-            command -v aws >/dev/null 2>&1 || pip install --no-cache-dir awscli
+            # Install your Python deps (requirements.txt exists at repo root)
+            python3 -m pip install --no-cache-dir --progress-bar off -r requirements.txt
 
-            echo "Running: python3 run_all_json_in_folders.py"
-            python3 run_all_json_in_folder.py
-            echo "Python script completed successfully"
+            # Run the script at repo root (singular 'folder')
+            echo "Running: python3 -u run_all_json_in_folder.py"
+            python3 -u run_all_json_in_folder.py
           '''
         }
       }
