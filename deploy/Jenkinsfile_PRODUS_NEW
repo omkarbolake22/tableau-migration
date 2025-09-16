@@ -51,7 +51,7 @@ pipeline {
             export PIP_PROGRESS_BAR=off
 
             # Install your Python deps (requirements.txt exists at repo root)
-            python3 -m pip install --no-cache-dir --progress-bar off -r requirements.txt
+            ##python3 -m pip install --no-cache-dir --progress-bar off -r requirements.txt
 
             # Run the script at repo root (singular 'folder')
             echo "Running: python3 -u run_all_json_in_folder.py"
