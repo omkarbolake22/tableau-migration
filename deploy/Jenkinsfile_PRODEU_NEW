@@ -55,7 +55,7 @@ pipeline {
             ##python3 -m pip install --no-cache-dir --progress-bar off -r requirements.txt
 
             # Run the script at repo root (singular 'folder')
-            echo "Running: python3 -u run_all_json_in_folder.py"
+            echo "Running: python3 -u run_all_json_in_folders_EU.py"
             python3 -u run_all_json_in_folder.py
           '''
         }
