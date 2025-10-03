@@ -2,7 +2,7 @@
     "customer_group_identifier": "pstest_customer_group_001",
     "target_schema_name": "analake_course_group7_db",
     "source_schema_name": "analake_catalog_db",
-    "where_condition": " company in( 'benchmark', 'sato-global', 'burando', 'kempower', 'hlib', 'jc', 'kkwindsolutions', 'aryzta', 'howdengrp', 'whof') ",
+    "where_condition": " company in( 'benchmark', 'sato-global', 'burando', 'kempower', 'hlib', 'jc', 'kkwindsolutions', 'aryzta', 'howdengrp', 'whof','kubota', 'morganwhite','navig8group') ",
     "base_tables": [
       "v_course_users_main_details_tblu"
     ],
