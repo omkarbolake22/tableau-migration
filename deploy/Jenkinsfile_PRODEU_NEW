@@ -3,7 +3,7 @@ pipeline {
   agent { label 'Tableau-Schema-Migration-Node' }
 
   environment {
-    AWS_REGION = 'us-east-1'
+    AWS_REGION = 'eu-west-1'
     ACCOUNT_ID = '180350466832'
     REPO_NAME  = 'tableau-schema-migration'
     REGISTRY   = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
